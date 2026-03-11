@@ -168,7 +168,7 @@ async def process_task(message: types.Message, state: FSMContext):
 
 async def reminder():
     while True:
-        await asyncio.sleep(20)
+        await asyncio.sleep(3600)
         async with aiosqlite.connect(DB_NAME) as db:
             cursor = await db.execute("SELECT DISTINCT user_id FROM tasks")
             users = await cursor.fetchall()

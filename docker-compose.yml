@@ -1,0 +1,8 @@
+services:
+  bot:
+    build: .
+    volumes:
+      - ./src/data:/app/data
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - DB_NAME=/app/data/task.db

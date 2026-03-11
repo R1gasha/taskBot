@@ -12,5 +12,5 @@ RUN pip install --upgrade pip && \
     pip install --upgrade pip setuptools wheel && \
     pip install -r req.txt
 
-COPY ./src /app
+COPY ./src/aiogramBot.py /app
 ENTRYPOINT ["python3", "/app/aiogramBot.py"]
