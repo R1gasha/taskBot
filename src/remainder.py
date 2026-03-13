@@ -7,7 +7,7 @@ from config import DB_NAME
 async def reminder(bot: Bot):
     while True:
         #timer = get_timer()
-        await asyncio.sleep(60)
+        await asyncio.sleep(180*60)
         async with aiosqlite.connect(DB_NAME) as db:
             await db.execute("PRAGMA foreign_keys = ON")
             cursor = await db.execute("SELECT DISTINCT user_id FROM users")
