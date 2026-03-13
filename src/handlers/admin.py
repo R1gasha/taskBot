@@ -1,32 +1,48 @@
 from aiogram import Router, types
 from aiogram.filters import Command
-import aiohttp
+from aiogram.fsm.context import FSMContext
+from database import *
+from fsm_states import States
 from aiogram import F
 
 # Список ID администраторов (можно также брать из БД)
 ADMIN_IDS = {391912003}
-CATS_URL = 'https://api.thecatapi.com/v1/images/search'
 
 router = Router()
 
 # Фильтр на уровне роутера – все хендлеры в этом роутере будут доступны только админам
 router.message.filter(F.from_user.id.in_(ADMIN_IDS))
 
-@router.message(Command('admin'))
+@router.message(lambda message: message.sticker)
 async def cmd_admin(message: types.Message):
-    await message.answer("Панель администратора")
+    print(message.sticker.file_id)
+    await message.answer(message.sticker.file_id)
 
-@router.message(Command(commands='cat'))
-async def send_cat(message: types.Message):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(CATS_URL) as resp:
-            if resp.status == 200:
-                data = await resp.json()
-                cat_url = data[0]['url']
-                await message.answer_photo(cat_url, caption="Вот тебе котик!")
-            else:
-                await message.answer("Не удалось получить котика 😿")
+@router.message(Command('admin_help'))
+async def cmd_admin(message: types.Message):
+    text_ = """
+    Полезнаю информация:
+    - Инитком 201-27-97
+    - Дубль В 221-91-91
 
-# @router.message(Command('stats'))
-# async def cmd_stats(message: types.Message):
-#     await message.answer("Статистика для админа")
+    """
+    await message.answer(text_)
+
+@router.message(Command(commands='timer'))
+async def addTimer(message: types.Message, state: FSMContext):
+    await message.answer('Установим мою частоту напоминаний:')
+    await state.set_state(States.timer_state)
+    current_state = await state.get_state()
+    print(current_state)
+
+@router.message(States.timer_state)
+async def proccess_timer(message: types.Message, state: FSMContext):
+    user_id = int(message.from_user.id)
+    try:
+        timer = int(message.text)
+    except ValueError:
+        await message.answer(f'Введите корректное число, а то не разработаем приложение')
+        return
+    await add_timer(user_id, timer)
+    await state.clear()
+    print("Состояние очищено")  

@@ -15,23 +15,24 @@ async def setup_commands(bot: Bot):
         BotCommand(command="add", description="Добавить задачу"),
         BotCommand(command="tasks", description="Список задач"),
         BotCommand(command="delete", description="Убрать задачу"),
-        BotCommand(command="timer", description="Частота напоминаний"),
-        BotCommand(command="clear_task", description="Очистить все задачи"),
+        BotCommand(command="cat", description="Посмотреть на котика"),
+        BotCommand(command="clear_task", description="Очистить все задачи")
     ]
     admin_ =  [
-        BotCommand(command="cat", description="Посмотреть на котика"),
-        BotCommand(command="admin", description="Приветствую, Ад")
+        BotCommand(command="admin_help", description="Немного помочь"),
+        BotCommand(command="timer", description="Частота напоминаний"),
     ]
 
     admin_commands = common_commands + admin_
-
     try:
+        await bot.set_my_commands(common_commands, scope=BotCommandScopeDefault())
+        print("Меню команд обновлено")
         for admin_id in ADMIN_IDS:
             await bot.set_my_commands(
                 admin_commands,
                 scope=BotCommandScopeChat(chat_id=admin_id)
-        )
-        print("Меню команд обновлено")
+            )
+            print("Меню команд обновлено for admin")
     except Exception as e:
         print(f"Ошибка обновления команд: {e}")   
         
