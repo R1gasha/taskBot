@@ -10,11 +10,11 @@
 Реализована БД(sqlite) с таблицами для хранения пользователей и задач пользователей. Соответствующие методы представлены в файле database.py.
 
 ## Установка зависимостией
-Созадать виртуальное окружение *python -m venv venv*
-*pip install --upgrade pip*
-*pip install -r req.txt*
+Созадать виртуальное окружение *python -m venv venv*  
+*pip install --upgrade pip*  
+*pip install -r req.txt*  
 
 
 ## Запуск бота
-*Вариант 1* через docker-compose.yml
+*Вариант 1* через docker-compose.yml  
 *Вариант 2* через запуск *python3 src.main.py*
