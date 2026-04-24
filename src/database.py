@@ -8,8 +8,9 @@ load_dotenv()
 DB_NAME = os.getenv('DB_NAME')
 
 class ItemManager:
-    def __init__(self, table_name: str):
+    def __init__(self, table_name: str, item_column: str):
         self.table_name = table_name
+        self.item_column = item_column
 
     async def add(self, user_id: int, item: str):
         async with aiosqlite.connect(DB_NAME) as db:
@@ -19,7 +20,7 @@ class ItemManager:
                 (user_id,)
             )
             await db.execute(
-                f"INSERT INTO {self.table_name} (user_id, item) VALUES (?, ?)",
+                f"INSERT INTO {self.table_name} (user_id, {self.item_column}) VALUES (?, ?)",
                 (user_id, item)
             )
             await db.commit()
@@ -27,7 +28,7 @@ class ItemManager:
     async def get_all(self, user_id: int):
         async with aiosqlite.connect(DB_NAME) as db:
             cursor = await db.execute(
-                f"SELECT item FROM {self.table_name} WHERE user_id = ? ORDER BY created_at",
+                f"SELECT {self.item_column} FROM {self.table_name} WHERE user_id = ? ORDER BY created_at",
                 (user_id,)
             )
             rows = await cursor.fetchall()
