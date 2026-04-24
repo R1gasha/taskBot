@@ -61,8 +61,8 @@ class ItemManager:
 
 #manager_table
 
-tasks_manager = ItemManager("tasks")
-magnit_manager = ItemManager("magnit")
+tasks_manager = ItemManager("tasks", item_column="task")
+magnit_manager = ItemManager("magnit", item_column="link")
 
 
 
