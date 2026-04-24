@@ -21,6 +21,7 @@ async def setup_commands(bot: Bot):
     admin_ =  [
         BotCommand(command="admin_help", description="Немного помочь"),
         BotCommand(command="timer", description="Частота напоминаний"),
+        BotCommand(command="magnit", description="Магнитическая"),
     ]
 
     admin_commands = common_commands + admin_

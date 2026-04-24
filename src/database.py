@@ -27,11 +27,23 @@ async def create_table_task(db):
         )
     ''')
 
+async def create_magnit_task(db):
+    await db.execute('''
+        CREATE TABLE IF NOT EXISTS magnit (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            link TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+        )
+    ''')
+
 async def init_db():
     async with aiosqlite.connect(DB_NAME) as db:
         await db.execute("PRAGMA foreign_keys = ON")
         await create_table_users(db)
         await create_table_task(db)
+        await create_magnit_task(db)
         await db.commit()
 
 
@@ -45,6 +57,19 @@ async def add_task(user_id: int, task: str):
         )
         await db.execute(
             "INSERT INTO tasks (user_id, task) VALUES (?, ?)",
+            (user_id, task)
+        )
+        await db.commit()
+
+async def add_magnit(user_id: int, task: str):
+    async with aiosqlite.connect(DB_NAME) as db:
+        await db.execute("PRAGMA foreign_keys = ON")
+        await db.execute(
+            "INSERT OR IGNORE INTO users (user_id, timer) VALUES (?, ?)",
+            (user_id, 0)
+        )
+        await db.execute(
+            "INSERT INTO magnit (user_id, link) VALUES (?, ?)",
             (user_id, task)
         )
         await db.commit()

@@ -28,6 +28,13 @@ async def cmd_admin(message: types.Message):
     """
     await message.answer(text_)
 
+@router.message(Command('magnit'))
+async def cmd_admin(message: types.Message, state: FSMContext):
+    await message.answer('Доставай все что есть!')
+    await state.set_state(States.magnit_state)
+    current_state = await state.get_state()
+    print(current_state)
+
 @router.message(Command(commands='timer'))
 async def addTimer(message: types.Message, state: FSMContext):
     await message.answer('Установим мою частоту напоминаний:')
@@ -46,3 +53,12 @@ async def proccess_timer(message: types.Message, state: FSMContext):
     await add_timer(user_id, timer)
     await state.clear()
     print("Состояние очищено")  
+
+@router.message(States.magnit_state)
+async def process_task(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+    link = message.text
+    await add_magnit(int(user_id), link)
+    await message.answer(f'Что-то новенькое? А, я понял!')
+    await state.clear() 
+    print("Состояние очищено")    
