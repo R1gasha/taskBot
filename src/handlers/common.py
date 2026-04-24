@@ -35,7 +35,7 @@ async def addTask(message: types.Message, state: FSMContext):
 
 @router.message(Command(commands='delete'))
 async def deleteTask(message: types.Message, state: FSMContext):
-    await message.answer('Укажите номер задачи дял удаления:')
+    await message.answer('Укажите номер задачи для удаления:')
     await printTask(message, state)
     await state.set_state(States.delete_state)
     current_state = await state.get_state()
@@ -45,7 +45,7 @@ async def deleteTask(message: types.Message, state: FSMContext):
 async def printTask(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     res: list
-    res = await get_tasks(int(user_id))
+    res = await tasks_manager.get_all(int(user_id))
     if res:
         await message.answer('\n'.join([f'{i + 1}. {item}' for i, item in enumerate(res)]))
     else:
@@ -55,7 +55,7 @@ async def printTask(message: types.Message, state: FSMContext):
 @router.message(Command(commands='clear_task'))
 async def clearTask(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
-    await clear_task(int(user_id))
+    await tasks_manager.clear(int(user_id))
     await message.answer('Задачи выполнены! Ты молодец!\nА я всего лишь стажер!')
 
 
@@ -63,7 +63,7 @@ async def clearTask(message: types.Message, state: FSMContext):
 async def process_delete(message: types.Message, state: FSMContext):
     user_id = int(message.from_user.id)
     number = int(message.text)
-    res = await delete_task(user_id, number)
+    res = await tasks_manager.delete(user_id, number)
     if res:
         await message.answer(f'Задача удалена!')
     else:
@@ -75,7 +75,7 @@ async def process_delete(message: types.Message, state: FSMContext):
 async def process_task(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     task = message.text
-    await add_task(int(user_id), task)
+    await tasks_manager.add(int(user_id), task)
     await message.answer(f'Задача "{task}" добавлена!')
     await state.clear()   # выходим из состояния
     print("Состояние очищено")      

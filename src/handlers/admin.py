@@ -28,10 +28,29 @@ async def cmd_admin(message: types.Message):
     """
     await message.answer(text_)
 
-@router.message(Command('magnit'))
+@router.message(Command('add_magnit'))
 async def cmd_admin(message: types.Message, state: FSMContext):
     await message.answer('Доставай все что есть!')
     await state.set_state(States.magnit_state)
+    current_state = await state.get_state()
+    print(current_state)
+
+@router.message(Command(commands='get_links'))
+async def printTask(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+    res: list
+    res = await magnit_manager.get_all(int(user_id))
+    if res:
+        await message.answer('\n'.join([f'{i + 1}. {item}' for i, item in enumerate(res)]))
+    else:
+        await message.answer('Ничего не добавили еще...')
+
+
+@router.message(Command(commands='delete_magnit'))
+async def deleteTask(message: types.Message, state: FSMContext):
+    await message.answer('Укажите номер ссылки для удаления:')
+    await printTask(message, state)
+    await state.set_state(States.delete_state)
     current_state = await state.get_state()
     print(current_state)
 
@@ -58,7 +77,20 @@ async def proccess_timer(message: types.Message, state: FSMContext):
 async def process_task(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     link = message.text
-    await add_magnit(int(user_id), link)
+    await magnit_manager.add(int(user_id), link)
     await message.answer(f'Что-то новенькое? А, я понял!')
     await state.clear() 
     print("Состояние очищено")    
+
+
+@router.message(States.delete_magnit_state)
+async def process_delete(message: types.Message, state: FSMContext):
+    user_id = int(message.from_user.id)
+    number = int(message.text)
+    res = await magnit_manager.delete(user_id, number)
+    if res:
+        await message.answer(f'Ссылка удалена!')
+    else:
+        await message.answer(f'Невозможно удалить ссылку!')
+    await state.clear()
+    print("Состояние очищено")  
