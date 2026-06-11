@@ -8,3 +8,5 @@ if not BOT_TOKEN:
     raise ValueError("No BOT_TOKEN in environment")
 
 DB_NAME = os.getenv('DB_NAME')
+HOST_METRIC = os.getenv('HOST_METRIC')
+PORT_METRIC = os.getenv('PORT_METRIC')

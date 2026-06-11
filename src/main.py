@@ -19,6 +19,7 @@ async def setup_commands(bot: Bot):
         BotCommand(command="clear_task", description="Очистить все задачи")
     ]
     admin_ =  [
+        BotCommand(command="metrics", description="Метрики прокси"),
         BotCommand(command="admin_help", description="Немного помочь"),
         BotCommand(command="timer", description="Частота напоминаний"),
         BotCommand(command="get_links", description="Магнитические ссылки"),

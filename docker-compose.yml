@@ -5,4 +5,8 @@ services:
       - ./src/data:/app/data
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
+      - HOST_METRIC=${HOST_METRIC}
+      - PORT_METRIC=${PORT_METRIC}
       - DB_NAME=/app/data/task.db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
