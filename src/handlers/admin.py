@@ -4,6 +4,9 @@ from aiogram.fsm.context import FSMContext
 from database import *
 from fsm_states import States
 from aiogram import F
+import aiohttp
+from config import HOST_METRIC, PORT_METRIC
+from prometheus_client.parser import text_string_to_metric_families
 
 # Список ID администраторов (можно также брать из БД)
 ADMIN_IDS = {391912003}
@@ -12,6 +15,37 @@ router = Router()
 
 # Фильтр на уровне роутера – все хендлеры в этом роутере будут доступны только админам
 router.message.filter(F.from_user.id.in_(ADMIN_IDS))
+
+@router.message(Command('metrics'))
+async def cmd_metrics(message: types.Message):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f'http://{HOST_METRIC}:{PORT_METRIC}/metrics') as resp:
+            if resp.status != 200:
+                await message.answer('Ошибка получения метрик')
+                return
+            text = await resp.text()
+
+    metrics = {
+        'telemt_user_connections_current': 0,
+        'telemt_user_unique_ips_current':0,
+        'telemt_user_unique_ips_limit': 0,
+        'telemt_user_unique_ips_utilization': 0,
+    }
+
+    target_user = 'hello'
+
+    for family in text_string_to_metric_families(text):
+        for sample in family.samples:
+            if sample.labels.get('user') == target_user:
+                if sample.name in metrics:
+                    metrics[sample.name] = sample.value
+
+    res = (f"{key} - {value}" for key, value in metrics.items())
+
+    await message.answer('\n'.join(res))
+
+
+
 
 @router.message(lambda message: message.sticker)
 async def cmd_admin(message: types.Message):
